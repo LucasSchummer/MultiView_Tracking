@@ -5,7 +5,7 @@ import cv2 as cv
 from modules.stitcher import Stitcher
 from matplotlib import pyplot as plt
 
-def main(frame_folder, output, out_format, ref_frame, warper_type):
+def main(frame_folder, output, out_format, ref_frame, detector, warper_type):
 
     folders = os.listdir(frame_folder)
     frames = [glob.glob(f'{frame_folder}/{folder}/*.jpg') for folder in folders]
@@ -17,7 +17,8 @@ def main(frame_folder, output, out_format, ref_frame, warper_type):
     else:
         ref_images = frames[0]
 
-    stitcher = Stitcher(warper_type).fit(ref_images)
+    # Estimate the stitching parameters on the ref frame and refine parameters with the first frame
+    stitcher = Stitcher(detector, warper_type).fit(ref_images, refining_img_paths=frames[0])
 
     # Stitch each frame if the parameters have been estimated
     if stitcher.ready:
@@ -50,6 +51,6 @@ def parse_args():
 if __name__ == '__main__':
 
     args = parse_args()
-    main(args.frame_folder, args.output, args.output_format, args.ref_frame, args.warper)
+    main(args.frame_folder, args.output, args.output_format, args.ref_frame, args.detector, args.warper)
 
-# python stitch.py --frame_folder "data/frame_sets/Test" --output "data/stitched_sets/Test" --ref_frame "../Prototype Raspberry/rasp_data/frame_sets/Ref40" --output_format tiff
+# python stitch.py --frame_folder "data/frame_sets/Test" --output "data/stitched_sets/Test" --ref_frame "../Prototype Raspberry/rasp_data/frame_sets/Ref40" --output_format png --detector sift

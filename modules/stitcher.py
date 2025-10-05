@@ -25,7 +25,7 @@ class Stitcher():
         self.seam_masks = None
         self.ready = False
 
-    def fit(self, img_paths):
+    def fit(self, img_paths, refining_img_paths):
 
         imgs = Images.of(list(img_paths))
 
@@ -93,6 +93,44 @@ class Stitcher():
         cropped_final_masks = list(self.cropper.crop_images(warped_final_masks, lir_aspect))
         final_corners, final_sizes = self.cropper.crop_rois(final_corners, final_sizes, lir_aspect)
 
+        self.refine_parameters(refining_img_paths)
+
+        print("Stitching parameters have been successfully estimated")
+        self.ready = True
+
+        return self
+    
+    def refine_parameters(self, ref_images):
+
+        # Open images and resize to low resolution
+        imgs = Images.of(list(ref_images))
+        low_imgs = list(imgs.resize(Images.Resolution.LOW))
+
+        low_sizes = imgs.get_scaled_img_sizes(Images.Resolution.LOW)
+        camera_aspect = imgs.get_ratio(Images.Resolution.MEDIUM, Images.Resolution.LOW)
+        warped_low_imgs = list(self.warper.warp_images(low_imgs, self.cameras, camera_aspect))
+        warped_low_masks = list(self.warper.create_and_warp_masks(low_sizes, self.cameras, camera_aspect))
+        low_corners, low_sizes = self.warper.warp_rois(low_sizes, self.cameras, camera_aspect)
+        
+        cropped_low_masks = list(self.cropper.crop_images(warped_low_masks))
+        cropped_low_imgs = list(self.cropper.crop_images(warped_low_imgs))
+        low_corners, low_sizes = self.cropper.crop_rois(low_corners, low_sizes)
+
+
+        # Get final size and ratio final/medium since warping was estimated on medium images
+        final_sizes = imgs.get_scaled_img_sizes(Images.Resolution.FINAL)
+        camera_aspect = imgs.get_ratio(Images.Resolution.MEDIUM, Images.Resolution.FINAL)
+
+        # Warp final masks
+        warped_final_masks = list(self.warper.create_and_warp_masks(final_sizes, self.cameras, camera_aspect))
+        final_corners, final_sizes = self.warper.warp_rois(final_sizes, self.cameras, camera_aspect)
+
+        # Get ratio final/low ratio since cropping ROI was obtained on low resolution images
+        lir_aspect = imgs.get_ratio(Images.Resolution.LOW, Images.Resolution.FINAL)
+        # Crop final images
+        cropped_final_masks = list(self.cropper.crop_images(warped_final_masks, lir_aspect))
+        final_corners, final_sizes = self.cropper.crop_rois(final_corners, final_sizes, lir_aspect)
+
         # Find seam masks on low images
         seam_finder = SeamFinder()
         self.seam_masks = seam_finder.find(cropped_low_imgs, low_corners, cropped_low_masks)
@@ -101,11 +139,7 @@ class Stitcher():
 
         # Evaluate the exposure correction to apply to each image
         self.compensator.feed(low_corners, cropped_low_imgs, cropped_low_masks)
-
-        print("Stitching parameters have been successfully estimated")
-        self.ready = True
-
-        return self
+        
 
     def stitch(self, img_paths):
 
