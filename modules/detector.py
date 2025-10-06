@@ -9,7 +9,7 @@ from modules.annotator import Annotator
 
 class Detector():
 
-    def __init__(self, model="yolo11s.pt", tile_mode="simple", tile_size=0, min_ov_ratio=.2, iou_thresh=.5, scale_factor=1, do_labels=True):
+    def __init__(self, model="yolo11s", tile_mode="simple", tile_size=0, min_ov_ratio=.2, iou_thresh=.5, scale_factor=1, do_labels=True):
         
         self.tiler = Tiler(tile_mode, tile_size, min_ov_ratio)
         self.model = YOLO(f'models/{model}.pt')

@@ -66,6 +66,8 @@ def parse_args():
     parser.add_argument("--no_labels", dest="do_labels", action="store_false",
                         help="Do not include labels on annotations")
     
+    parser.set_defaults(do_labels=True)
+    
 
     return parser.parse_args()
 
