@@ -5,6 +5,8 @@ import torch
 from ultralytics import YOLO
 from ultralytics.utils.ops import non_max_suppression
 
+from modules.annotator import Annotator
+
 class Detector():
 
     def __init__(self, model="yolo11s.pt", tile_mode="simple", tile_size=0, min_ov_ratio=.2, iou_thresh=.5, scale_factor=1, do_labels=True):
@@ -12,18 +14,9 @@ class Detector():
         self.tiler = Tiler(tile_mode, tile_size, min_ov_ratio)
         self.model = YOLO(f'models/{model}.pt')
         self.iou_thresh = iou_thresh
-        self.do_labels = do_labels
+        
+        self.annotator = Annotator(scale_factor, do_labels)
 
-        self.bb_annotator = sv.BoxAnnotator(
-            thickness = int(3 * scale_factor)  # Scale the box thickness
-        )
-
-        if do_labels:
-            self.lbl_annotator = sv.LabelAnnotator(
-                text_thickness = int(2 * scale_factor),
-                text_scale = 1 * scale_factor,
-                text_padding =  int(4 * scale_factor)
-            )
 
     def __call__(self, image, conf_thresh=.3):
         
@@ -32,7 +25,7 @@ class Detector():
 
         detections, labels = self.detect(img, conf_thresh)
 
-        return self.annotate_frame(img, detections, labels)
+        return self.annotator(img, detections, labels)
     
 
     def detect(self, image, conf_thresh):
@@ -74,14 +67,6 @@ class Detector():
 
         return detections, labels
     
-
-    def annotate_frame(self, img, detections, labels):
-
-        annotated_frame = self.bb_annotator.annotate(scene=img.copy(), detections=detections)
-        if self.do_labels: annotated_frame = self.lbl_annotator.annotate(scene=annotated_frame, detections=detections, labels=labels)
-
-        return annotated_frame
-
 
     def merge_detections(self, detections):
 
