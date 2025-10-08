@@ -117,12 +117,19 @@ class Tiler():
         if self.tile_mode == "tile":
 
             # Compute the number of tiles fitting and adding one to adapt stride by increasing overlap_ratio
-            n_tiles_x, stride_x = self.get_n_tiles(w, tile_size)
-            n_tiles_y, stride_y = self.get_n_tiles(h, tile_size)
+            n_tiles_x, stride_x = self.get_n_tiles(w, self.tile_size)
+            n_tiles_y, stride_y = self.get_n_tiles(h, self.tile_size)
 
-            for y in range(0, h - tile_size + 1, stride_y):
-                for x in range(0, w - tile_size + 1, stride_x):
-                    tile = img[y:y+tile_size, x:x+tile_size]
+            # for y in range(0, h - self.tile_size + 1, stride_y):
+            #     for x in range(0, w - self.tile_size + 1, stride_x):
+            #         tile = img[y:y+self.tile_size, x:x+self.tile_size]
+            #         tiles.append((tile, x, y))
+
+            for i in range(n_tiles_x):
+                for j in range(n_tiles_y):
+                    y = j * stride_y
+                    x = i * stride_x
+                    tile = img[y : y+self.tile_size, x : x+self.tile_size]
                     tiles.append((tile, x, y))
 
         elif self.tile_mode == "line":
@@ -136,14 +143,14 @@ class Tiler():
                 n_tiles, stride = self.get_n_tiles(w, h)
                 for i in range(n_tiles):
                     x = i * stride
-                    tile = img[0:tile_size, x:x+tile_size]
+                    tile = img[:, x:x+tile_size]
                     tiles.append((tile, x, 0))
             else:
                 
                 n_tiles, stride = self.get_n_tiles(h, w)
                 for i in range(n_tiles):
                     y = i * stride
-                    tile = img[y:y+tile_size, 0:tile_size]
+                    tile = img[y:y+tile_size, :]
                     tiles.append((tile, 0, y))
 
         else:
@@ -160,13 +167,13 @@ class Tiler():
             if n_tiles*tile_size < tot_pix:
                 n_tiles += 1
                 continue
-            overlap_ratio = ((tile_size * n_tiles) - tot_pix) / (n_tiles - 1) / tile_size if n_tiles > 1 else tile_size
+            overlap_ratio = ((tile_size * n_tiles) - tot_pix) / (n_tiles - 1) / tile_size if n_tiles > 1 else 1
             if overlap_ratio < self.min_ov_ratio:
                 n_tiles += 1
                 continue
 
             break
 
-        stride = int(tile_size - ((tile_size * n_tiles) - tot_pix) / (n_tiles - 1)) if n_tiles > 1 else tile_size
+        stride = int(tile_size - ((tile_size * n_tiles) - tot_pix) / (n_tiles - 1)) if n_tiles > 1 else 0
 
         return n_tiles, stride

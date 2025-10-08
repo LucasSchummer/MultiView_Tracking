@@ -32,5 +32,21 @@ def frame_iterator(path):
         raise ValueError(f"Invalid input path: {path}")
     
 
-import supervision as sv
-detections = sv.Detections.empty()
+def get_total_frames(path):
+
+    if os.path.isdir(path):
+        # --- Folder mode ---
+        image_paths = sorted(glob.glob(os.path.join(path, "*.*")))
+        
+        return len(image_paths)
+
+    elif os.path.isfile(path):
+        # --- Video mode ---
+        cap = cv.VideoCapture(path)
+        if not cap.isOpened():
+            raise ValueError(f"Cannot open video: {path}")
+        
+        return int(cap.get(cv.CAP_PROP_FRAME_COUNT))
+    
+    else:
+        raise ValueError(f"Invalid input path: {path}")
