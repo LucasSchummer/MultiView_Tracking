@@ -12,7 +12,7 @@ A modular Python toolkit for **multi-view computer vision**, featuring:
 ```bash
 # 1. Clone the repository
 git clone https://github.com/LucasSchummer/MultiView_Tracking.git
-cd multiview-toolkit
+cd MultiView_Tracking
 
 # 2. (Recommended) Create a virtual environment
 python3 -m venv venv
