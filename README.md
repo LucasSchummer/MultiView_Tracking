@@ -45,7 +45,7 @@ python main.py stitch \
 ⚠️ Your frame folder should only contain folders, one per frame. Each individual subfolder should contain the different views of a given scene
 
 **Optional arguments :**
-```
+```bash
     --ref_frame : Reference frame folder for parameter estimation.
     --out_format : Output format ('jpg', 'png', 'tiff'). Default : 'jpg'
     --detector : Keypoint detector ('orb', 'sift', 'brisk', 'akaze'). Default : 'orb'
@@ -62,7 +62,7 @@ python main.py detect \
 ```
 
 **Optional arguments :**
-```
+```bash
     --out_format : Output format ('jpg', 'png', 'tiff', 'mp4'). Default : 'jpg'
     --out_fps : Output framerate (if mp4). Default : 30
     --detector : YOLO model to use (yoloxx or 'fishes'). Default : yolo11s
@@ -85,7 +85,7 @@ python main.py track \
 ```
 
 **Optional arguments :**
-```
+```bash
     --tracker : Tracker to use ('ByteTrack', 'DeepSort'). Default : 'ByteTrack'
     --out_format : Output format ('jpg', 'png', 'tiff', 'mp4'). Default : 'jpg'
     --out_fps : Output framerate (if mp4). Default : 30
@@ -103,19 +103,60 @@ python main.py track \
 
 ### 🛠️ Example Workflow
 
-1. **Stitch frames** from multiple cameras into panoramas:
+#### 1. **Stitching**
+
+**Stitch frames** from multiple cameras into panoramas :
    ```bash
-   python main.py stitch --frame_folder data/camera_frames --output stitched/
+   python main.py stitch --frame_folder data/ex_frame_folder --output stitched/ex
    ```
 
-2. **Detect objects** in the stitched frames:
+**Stitch frames** using a reference frame to estimate parameters :
    ```bash
-   python main.py detect --input stitched/ --output detections/
+   python main.py stitch --frame_folder data/ex_frame_folder --output stitched/ex --ref_frame data/ref_frame_folder
    ```
 
-3. **Track objects** across frames:
+**Stitch frames** using a different keypoint detector and warper :
    ```bash
-   python main.py track --input detections/ --output tracked/
+   python main.py stitch --frame_folder data/ex_frame_folder --output stitched/ex --detector sift --warper cylindrical
+   ```
+
+#### 2. **Object detection**
+
+**Detect objects** on frames :
+   ```bash
+   python main.py detect --input stitched/ex --output detections/ex
+   ```
+
+**Detect objects** with a custom YOLO model (stored in 'models/') :
+   ```bash
+   python main.py detect --input stitched/ex --output detections/ex --detector fishes
+   ```
+
+**Detect objects** using tiling :
+   ```bash
+   python main.py detect --input stitched/ex --output detections/ex --tile_mode tile --tile_size 1000
+   ```
+
+**Detect objects** and output a video :
+   ```bash
+   python main.py detect --input stitched/ex --output detections/ex --out_format mp4 --out_fps 3
+   ```
+
+#### 3. **Multi-object Tracking**
+
+**Track objects** across frames :
+   ```bash
+   python main.py track --input stitched/ex --output tracking/ex
+   ```
+
+**Track objects** on a video :
+   ```bash
+   python main.py track --input stitched/ex.mp4 --output tracking/ex --out_format mp4
+   ```
+
+**Track objects** with DeepSort :
+   ```bash
+   python main.py track --input stitched/ex --output tracking/ex --tracker DeepSort
    ```
 
 ---
