@@ -11,7 +11,7 @@ A modular Python toolkit for **multi-view computer vision**, featuring:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/multiview-toolkit.git
+git clone https://github.com/LucasSchummer/MultiView_Tracking.git
 cd multiview-toolkit
 
 # 2. (Recommended) Create a virtual environment
@@ -42,7 +42,7 @@ python main.py stitch \
 
 ```
 
-⚠️ Your frame folder should only contain folders, one per frame. Each induvidual subfolder should contain the different views of a given scene
+⚠️ Your frame folder should only contain folders, one per frame. Each individual subfolder should contain the different views of a given scene
 
 **Optional arguments :**
 ```
