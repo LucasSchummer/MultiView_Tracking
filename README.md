@@ -45,7 +45,7 @@ python main.py stitch \
 ⚠️ Your frame folder should only contain folders, one per frame. Each individual subfolder should contain the different views of a given scene
 
 **Optional arguments :**
-```bash
+```
     --ref_frame : Reference frame folder for parameter estimation.
     --out_format : Output format ('jpg', 'png', 'tiff'). Default : 'jpg'
     --detector : Keypoint detector ('orb', 'sift', 'brisk', 'akaze'). Default : 'orb'
@@ -62,7 +62,7 @@ python main.py detect \
 ```
 
 **Optional arguments :**
-```bash
+```
     --out_format : Output format ('jpg', 'png', 'tiff', 'mp4'). Default : 'jpg'
     --out_fps : Output framerate (if mp4). Default : 30
     --detector : YOLO model to use (yoloxx or 'fishes'). Default : yolo11s
@@ -85,7 +85,7 @@ python main.py track \
 ```
 
 **Optional arguments :**
-```bash
+```
     --tracker : Tracker to use ('ByteTrack', 'DeepSort'). Default : 'ByteTrack'
     --out_format : Output format ('jpg', 'png', 'tiff', 'mp4'). Default : 'jpg'
     --out_fps : Output framerate (if mp4). Default : 30
